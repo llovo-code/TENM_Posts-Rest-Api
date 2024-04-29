@@ -20,16 +20,16 @@ const PostSchema = new mongoose_1.default.Schema({
     CreateAt: {
         type: Date,
         require: true,
-        //default: new Date().toISOString()
+        default: new Date()
     },
     UpdateAt: {
         type: Date,
-        require: true
+        require: true,
+        default: new Date()
     },
     Author: {
         type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'User',
-        //type:String,
         require: true
     },
     Image: {
@@ -41,24 +41,14 @@ const PostSchema = new mongoose_1.default.Schema({
         unique: true,
         lowercase: true
     }
-}
-//,{
-//     toJSON: {
-//         transform: function (doc, ret) {
-//             ret.id = ret._id; // Renombrar _id a id
-//             delete ret._id; // Eliminar _id
-//             delete ret.__v; // Eliminar __v
-//             return ret;
-//         }
-//     }
-// }
-);
-PostSchema.methods.toJSON = function () {
-    const postObject = this.toObject(); // Obtener el objeto de documento
-    // Renombrar _id a id y eliminar _id y __v del objeto de documento
-    postObject.id = postObject._id;
-    delete postObject._id;
-    delete postObject.__v;
-    return postObject; // Devolver el objeto de documento modificado
-};
+}, {
+    toJSON: {
+        transform: function (doc, ret) {
+            ret.id = ret._id; // Renombrar _id a id
+            delete ret._id; // Eliminar _id
+            delete ret.__v; // Eliminar __v
+            return ret;
+        }
+    }
+});
 exports.default = mongoose_1.default.model('Posts', PostSchema);

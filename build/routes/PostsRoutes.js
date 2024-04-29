@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostRoutes = void 0;
 const express_1 = require("express");
 const PostSchema_1 = __importDefault(require("../Schemas/PostSchema"));
+const UserSchema_1 = __importDefault(require("../Schemas/UserSchema"));
 // import PostSchema from "../Schemas/PostSchema";
 class PostRoutes {
     /**
@@ -24,10 +25,32 @@ class PostRoutes {
         this.router = (0, express_1.Router)();
         this.Routes();
     }
+    getPostsByUser(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let { Email } = req.body;
+                let user = yield UserSchema_1.default.findOne({ Email });
+                if (!user) {
+                    return res.status(404).json({ error: "Usuario no encontrado" });
+                }
+                let [Total, Posts] = yield Promise.all([PostSchema_1.default.countDocuments({ Author: user === null || user === void 0 ? void 0 : user.id }), PostSchema_1.default.find({ Author: user === null || user === void 0 ? void 0 : user.id }).populate('Author')]);
+                return res.status(201).json({
+                    msg: `Los Post Realizados por el usuario ${user.Name}`,
+                    Total,
+                    Posts
+                });
+            }
+            catch (error) {
+                console.error(error);
+                return res.status(500).json({
+                    error: `Se ha presentado un error al momento de procesar la solicitud ${error}, ${error.menssage}`
+                });
+            }
+        });
+    }
     getPosts(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            //let posts = await PostSchema.countDocuments().find();
-            let [Totals, Elements] = yield Promise.all([PostSchema_1.default.countDocuments(), PostSchema_1.default.find()]);
+            let [Totals, Elements] = yield Promise.all([PostSchema_1.default.countDocuments(), PostSchema_1.default.find().populate('Author')]);
             res.json({
                 msg: "Total de Elementos Registrados",
                 Totals,
@@ -37,22 +60,33 @@ class PostRoutes {
     }
     getPost(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            res.send("Post");
+            let reqPost = req.body;
+            let post = yield PostSchema_1.default.findOne({ Title: reqPost.Title });
+            res.json({
+                msg: "Documento",
+                post
+            });
         });
     }
     CreatePosts(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            //console.log(<IPosts>req.body);
-            let Bposts = req.body;
-            //console.log(`Post to save ${Bposts}`);
-            Bposts.CreateAt = new Date();
-            Bposts.UpdateAt = new Date();
-            let post = new PostSchema_1.default(Bposts);
-            yield post.save().then(() => console.log("Post guardado")).catch((e) => console.log(e));
-            //console.log(post.toJSON());
-            res.json({
-                msg: "Post Guardado Exitosamente"
-            });
+            try {
+                let Bposts = req.body;
+                let user = yield UserSchema_1.default.findOne({ Email: Bposts.Author.Email });
+                if (!user) {
+                    return res.status(404).json({ error: "Usuario no encontrado." });
+                }
+                let post = new PostSchema_1.default(Bposts);
+                post.Author = user.id;
+                yield post.save().then(() => console.log("Post guardado")).catch((e) => console.log(e));
+                return res.status(201).json({
+                    msg: "Post Guardado Exitosamente",
+                    post
+                });
+            }
+            catch (error) {
+                res.status(500).json({ error: `Ha ocurrido un problema al procesar la peticion:  ${error.message}, ${error.name}` });
+            }
         });
     }
     UpdatePosts(req, res) {
@@ -63,6 +97,7 @@ class PostRoutes {
     }
     Routes() {
         return __awaiter(this, void 0, void 0, function* () {
+            this.router.get('/getPostsByUser', this.getPostsByUser);
             this.router.get('/getPosts', this.getPosts);
             this.router.get('/getPost', this.getPost);
             this.router.post('/CreatePosts', this.CreatePosts);

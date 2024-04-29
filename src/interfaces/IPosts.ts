@@ -8,7 +8,7 @@ export interface IPosts{
     Content:string;
     CreateAt:Date;
     UpdateAt:Date;
-    Author:IUser["id"];
+    Author:IUser;
     Url:string;
     Image:string;
 }
