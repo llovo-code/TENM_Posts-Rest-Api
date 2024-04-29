@@ -26,7 +26,6 @@ class UserRoutes {
     }
     getUsers(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            //let User = await Userchema.countDocuments().find();
             let [Totals, Elements] = yield Promise.all([UserSchema_1.default.countDocuments(), UserSchema_1.default.find()]);
             res.json({
                 msg: "Total de Elementos Registrados",
@@ -42,16 +41,12 @@ class UserRoutes {
     }
     CreateUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            //console.log(<IUser>req.body);
             let BUser = req.body;
-            //console.log(`User to save ${BUser}`);
-            BUser.CreateAt = new Date();
-            BUser.UpdateAt = new Date();
             let user = new UserSchema_1.default(BUser);
             yield user.save().then(() => console.log("User guardado")).catch((e) => console.log(e));
-            //console.log(User.toJSON());
             res.json({
-                msg: "User Guardado Exitosamente"
+                msg: "User Guardado Exitosamente",
+                user
             });
         });
     }

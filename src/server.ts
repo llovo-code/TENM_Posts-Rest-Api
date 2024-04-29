@@ -11,6 +11,7 @@ import path from 'path';
 import {IndexRoutes} from './routes/indexRoutes'
 import { PostRoutes } from './routes/PostsRoutes';
 import { DbConnection } from './databases/dbConfig';
+import { UserRoutes } from './routes/UserRoutes';
 class Server {
     public app:express.Application;
     // public indexRoutes: express.Router;
@@ -44,6 +45,7 @@ class Server {
     routes(){
         this.app.use(new IndexRoutes().router);
         this.app.use('/api',new PostRoutes().router);
+        this.app.use('/api',new UserRoutes().router)
     }
 
     start(){

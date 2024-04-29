@@ -15,7 +15,6 @@ export class UserRoutes{
 
     async getUsers(req:Request, res:Response){
 
-        //let User = await Userchema.countDocuments().find();
         let [Totals, Elements] = await Promise.all([User.countDocuments(),User.find<IUser>()]);
         res.json({
             msg:"Total de Elementos Registrados",
@@ -29,16 +28,12 @@ export class UserRoutes{
     }
 
     async CreateUser(req:Request, res:Response){
-        //console.log(<IUser>req.body);
         let BUser:IUser= req.body;
-        //console.log(`User to save ${BUser}`);
-        BUser.CreateAt = new Date();
-        BUser.UpdateAt = new Date();
         let user = new User(BUser);
         await user.save().then(()=> console.log("User guardado")).catch((e)=> console.log(e));
-        //console.log(User.toJSON());
         res.json({
-            msg:"User Guardado Exitosamente"
+            msg:"User Guardado Exitosamente",
+            user
         });
     }
     UpdateUser(req:Request, res:Response){

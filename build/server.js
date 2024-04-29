@@ -22,6 +22,7 @@ const path_1 = __importDefault(require("path"));
 const indexRoutes_1 = require("./routes/indexRoutes");
 const PostsRoutes_1 = require("./routes/PostsRoutes");
 const dbConfig_1 = require("./databases/dbConfig");
+const UserRoutes_1 = require("./routes/UserRoutes");
 class Server {
     // public indexRoutes: express.Router;
     constructor() {
@@ -49,6 +50,7 @@ class Server {
     routes() {
         this.app.use(new indexRoutes_1.IndexRoutes().router);
         this.app.use('/api', new PostsRoutes_1.PostRoutes().router);
+        this.app.use('/api', new UserRoutes_1.UserRoutes().router);
     }
     start() {
         this.app.listen(this.app.get('port'), () => {
